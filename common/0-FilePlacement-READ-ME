@@ -1,0 +1,17 @@
+Files in the .../common/ folder
+
+Scripts:
+  feliz
+  shared
+
+For reference only:
+  keymaps.list
+  listgen.manual
+
+Copy to folder:
+  rc.xml            ~/.config/openbox/
+  menu.xml          ~/.config/openbox/
+  conkyrc           ~/
+
+  pacman.conf
+  virtualbox.conf

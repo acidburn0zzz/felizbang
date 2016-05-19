@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openbox_menu xmlns="http://openbox.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://openbox.org/                 file:///usr/share/openbox/menu.xsd">
+	<menu id="root-menu" label="Openbox 3">
+		<separator/>
+		<item label="I Am Not Your Queen">
+			<action name="Execute">
+				<execute>pcmanfm /home/elizabeth/0-IAmNotYourQueen/</execute>
+			</action>
+		</item>
+		<separator/>
+		<item label="Firefox">
+			<action name="Execute">
+				<execute>firefox</execute>
+			</action>
+		</item>
+		<item label="Terminal emulator">
+			<action name="Execute">
+				<execute>lxterminal</execute>
+			</action>
+		</item>
+		<item label="File Manager">
+			<action name="Execute">
+				<execute>pcmanfm</execute>
+			</action>
+		</item>
+		<item label="Text Editor">
+			<action name="Execute">
+				<execute>geany</execute>
+			</action>
+		</item>
+		<!-- This requires the presence of the 'menu' package to work -->
+		<item label="Screenshot">
+			<action name="Execute">
+				<execute>gscreenshot</execute>
+			</action>
+		</item>
+		<item label="Thesaurus">
+			<action name="Execute">
+				<execute>artha</execute>
+			</action>
+		</item>
+		<separator/>
+		<menu id="/Debian/Applications"/>
+		<separator/>
+		<menu id="Appearance" label="Settings">
+			<item label="Change Wallpaper">
+				<action name="Execute">
+					<execute>nitrogen ~/Pictures/Wallpapers/</execute>
+				</action>
+			</item>
+			<item label="Desktop Appearance">
+				<action name="Execute">
+					<execute>lxappearance</execute>
+				</action>
+			</item>
+			<item label="GUI Menu Editor">
+				<action name="Execute">
+					<execute>obmenu</execute>
+				</action>
+			</item>
+			<item label="Window Appearance">
+				<action name="Execute">
+					<execute>obconf</execute>
+				</action>
+			</item>
+			<item label="Restart Openbox">
+				<action name="Restart"/>
+			</item>
+			<item label="Reconfigure Openbox">
+				<action name="Reconfigure"/>
+			</item>
+		</menu>
+		<separator/>
+		<item label="LibreOffice Writer">
+			<action name="Execute">
+				<execute>libreoffice --writer</execute>
+			</action>
+		</item>
+		<item label="Alarm Clock">
+			<action name="Execute">
+				<execute>alarm-clock-applet</execute>
+			</action>
+		</item>
+		<item label="Calendar">
+			<action name="Execute">
+				<execute>orage</execute>
+			</action>
+		</item>
+		<item label="Install/remove Software">
+			<action name="Execute">
+				<execute>gksu synaptic</execute>
+			</action>
+		</item>
+		<item label="Sparky Updater">
+			<action name="Execute">
+				<execute>sparky-aptus-upgrade</execute>
+			</action>
+		</item>
+		<separator/>
+		<item label="Virtualbox">
+			<action name="Execute">
+				<execute>virtualbox</execute>
+			</action>
+		</item>
+		<separator/>
+		<item label="Backup">
+			<action name="Execute">
+				<execute>backup</execute>
+			</action>
+		</item>
+		<item label="Solitaire">
+			<action name="Execute">
+				<execute>sol</execute>
+			</action>
+		</item>
+		<item label="Mahjongg">
+			<action name="Execute">
+				<execute>gnome-mahjongg</execute>
+			</action>
+		</item>
+		<item label="Volume">
+			<action name="Execute">
+				<execute>pavucontrol</execute>
+			</action>
+		</item>
+		<item label="Logout">
+			<action name="Execute">
+				<execute>lxde-logout</execute>
+			</action>
+		</item>
+	</menu>
+</openbox_menu>

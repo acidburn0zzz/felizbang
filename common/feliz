@@ -1,0 +1,146 @@
+#!/bin/bash
+
+# The FelizBang installation scripts for Openbox Arch Linux
+# May 2016
+
+# /common/feliz - Main module
+
+# Developed by Elizabeth Mills, incorporating some code adapted from
+# the Evo/Lution script by Carl Duff and AUI scripts by HelmuthDU.
+
+# Please read the introduction in the README file
+
+#
+# Include source files
+#
+source shared
+source various
+source partitioning
+source desktop
+source listgen
+
+Backtitle="The Feliz-pop install scripts for Openbox Arch Linux"
+
+StartTime=$(date +%s)
+echo "${StartTime}" >> feliz.log
+
+# Check partition table & offer options
+CheckParts
+
+if [ $AutoPart -eq 0 ]; then
+  BuildPartitionLists # Display information about the available partitions
+  AllocateRoot
+  if [ -n "${PartitionList}" ]
+  then
+    AllocateSwap  # Display remaining partitions and allocate swap
+  fi
+  if [ -n "${PartitionList}" ]  # Check contents of PartitionList again
+  then
+    MorePartitions
+  fi
+fi
+
+# Select kernel and device for Grub
+SetKernel
+if [ $AutoPart -eq 0 ]; then
+  SetGrubDevice
+fi
+
+# Keyboard layout
+getkeymap
+
+# Localisation
+SetTimeZone
+setlocale
+SetHostname
+
+# Use dmidecode to check for Virtualbox installation
+IsInVbox=`dmidecode --type 1 | grep 'Product Name' | cut -c 16-`
+if [ ${IsInVbox} = "VirtualBox" ]; then
+  ConfirmVbox
+else
+  IsInVbox=""
+fi
+
+# Allow user to change any variables
+FinalCheck
+
+# No further user intervention from here ..................
+
+MountPartitions
+
+ReflectorMirrorList
+
+InstallKernel
+
+TPecho "Preparing local services" ""
+
+# Set the default PATH variable
+arch_chroot "PATH=/usr/lib/systemd/system:/etc/systemd/system:/usr/local/sbin:/usr/local/bin:/usr/bin"
+
+# Generate fstab
+genfstab -U -p /mnt > /mnt/etc/fstab 2>> feliz.log
+if [ ${SwapFile} ]; then
+  fallocate -l ${SwapFile} /mnt/swapfile >/dev/null 2>> feliz.log
+  chmod 600 /mnt/swapfile >/dev/null &>> feliz.log
+  mkswap /mnt/swapfile >/dev/null &>> feliz.log
+  swapon /mnt/swapfile >/dev/null &>> feliz.log
+  echo "/swapfile none  swap  defaults  0 0" >> /mnt/etc/fstab 2>> feliz.log
+fi
+echo ${HostName} > /mnt/etc/hostname 2>> feliz.log
+sed -i "/127.0.0.1/s/$/ ${HostName}/" /mnt/etc/hosts &>> feliz.log
+sed -i "/::1/s/$/ ${HostName}/" /mnt/etc/hosts &>> feliz.log
+# Set up locale, etc
+echo "${CountryLocale} UTF-8" > /mnt/etc/locale.gen 2>> feliz.log # eg: en_US.UTF-8 UTF-8
+arch_chroot "locale-gen"
+echo "LANG=${CountryLocale}" > /mnt/etc/locale.conf 2>> feliz.log # eg: LANG=en_US.UTF-8
+export "LANG=${CountryLocale}" &>> feliz.log                      # eg: LANG=en_US.UTF-8
+arch_chroot "ln -sf /usr/share/zoneinfo/${ZONE}/${SUBZONE} /etc/localtime"
+arch_chroot "hwclock --systohc --utc"
+# Networking
+if [ $Scope != "Basic" ]; then
+  arch_chroot "systemctl enable dhcpcd.service"
+  pacstrap /mnt networkmanager network-manager-applet rp-pppoe &>> feliz.log
+  arch_chroot "systemctl enable NetworkManager.service && systemctl enable NetworkManager-dispatcher.service"
+fi
+
+if [ ${GrubDevice} ]; then
+  TPecho "Installing Grub2 to $GrubDevice" ""
+  pacstrap /mnt grub &>> feliz.log
+  if [ $OSprober = "Y" ]; then
+    pacstrap /mnt os-prober &>> feliz.log
+  fi
+  arch_chroot "grub-install --target=i386-pc --recheck ${GrubDevice}"
+  arch_chroot "grub-mkconfig -o /boot/grub/grub.cfg"
+else
+  echo "Not installing Grub" >> feliz.log
+fi
+
+McInitCPIO
+
+# Set keyboard to selected language at next startup
+echo KEYMAP=${Countrykbd} > /mnt/etc/vconsole.conf 2>> feliz.log
+
+AddCodecs # Various bits
+
+InstallLuxuries # common/shared Install Openbox, applications and lightdm
+
+UserAdd # common/shared
+
+# ... copy over Openbox .conf and .xml files here .......................................................
+
+EndTime=$(date +%s)
+Difference=$(( $EndTime-$StartTime ))
+DIFFMIN=$(( $Difference / 60 ))
+DIFFSEC=$(( $Difference % 60 ))
+
+SetRootPassword
+if [ $Scope != "Basic" ]; then
+  SetUserPassword
+fi
+
+cp feliz.log /mnt/etc # Copy installation log for reference
+
+DisplayFinished
+
+shutdown -h now
