@@ -128,14 +128,14 @@ InstallLuxuries # common/shared Install Openbox, applications and lightdm
 
 UserAdd # common/shared
 
-# ... copy over Openbox .conf and .xml files here .......................................................
-mkdir /mnt/home/$UserName/.config/
-mkdir /mnt/home/$UserName/.config/openbox/
+# Openbox .conf and .xml files ...
+arch_chroot "mkdir /home/$UserName/.config/"
+arch_chroot "mkdir /home/$UserName/.config/openbox/"
 cp rc.xml menu.xml /mnt/home/$UserName/.config/openbox/
 cp conkyrc /mnt/home/$UserName/.conkyrc
 cp bl-exit /mnt/usr/bin/
-mkdir /mnt/home/$UserName/Pictures/
-mkdir /mnt/home/$UserName/Pictures/Wallpapers/
+arch_chroot "mkdir /home/$UserName/Pictures/"
+arch_chroot "mkdir /home/$UserName/Pictures/Wallpapers/"
 cp wallpaper.jpg /mnt/home/$UserName/Pictures/Wallpapers/
 
 EndTime=$(date +%s)
