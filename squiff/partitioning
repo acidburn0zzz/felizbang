@@ -209,7 +209,7 @@ AllocateRoot() {
   Partition=""
   PartitionType=""
   listgen2 "$PartitionList" "PartitionArray"
-  dialog --backtitle "$Backtitle" --title " - Partitions - " --no-shadow --ok-button "Select" --nocancel --menu "Please now select a partition to use for /root\n" 14 60 $Counter "${Options[@]}" 2> output.file
+  dialog --backtitle "$Backtitle" --title " - Partitions - " --no-shadow --ok-button "Select" --nocancel --menu "Please select a partition to use for /root\n" 14 60 $Counter "${Options[@]}" 2> output.file
   Reply=$(cat output.file)
   PassPart="$Reply"
   SetLabel "$Reply"
@@ -228,7 +228,7 @@ AllocateRoot() {
         local Message="$Message\nYou can choose to leave it as it is, but should be aware that not reformatting the root partition can have unexpected consequences."
         FileSystem "None"
       else
-        local Message="Please now select the file system for ${Partition} ... It is not recommended to mix the btrfs file-system with others.\n"
+        local Message="Please select the file system for ${Partition} ... It is not recommended to mix the btrfs file-system with others.\n"
         FileSystem "None"
       fi
       if [ -z ${PartitionType} ] && [ ${CurrentType} ]; then

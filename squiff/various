@@ -15,18 +15,13 @@
 # -------------------------      -------------------------
 # Functions           Line       Functions           Line
 # -------------------------      -------------------------
-# arch_chroot           27       ConfirmReview        112
-# PrintOne              31       SetGrubDevice        120
-# TPecho                35
+# PrintOne              31       ConfirmReview        112
+# TPecho                35       SetGrubDevice        120
 # DisplayProgress       39       MountPartitions      134
 # ProgressArray         58       InstallKernel        192
 # Bugger                83       AddCodecs            218
 # SetKernel             87       Passwords            233
 # ConfirmVbox           99       Finish               261
-
-arch_chroot() {  # From Lution AIS
-  arch-chroot /mnt /bin/bash -c "${1}" &>> feliz.log
-}
 
 PrintOne() {  # Arguments: "Component" "Patient"
   dialog --backtitle "$Backtitle" --title " - Information - " --no-shadow --infobox "\n$1\n$2" 6 50 ; sleep 1 &
@@ -207,7 +202,7 @@ InstallKernel() { # Kernel and some other core systems
     pacstrap /mnt linux &>> feliz.log
   esac
   if [ -n ${IsInVbox} ] && [ $Scope != "Basic" ]; then # Installing in Virtualbox
-    pacstrap /mnt virtualbox-guest-utils &>> feliz.log
+    pacstrap /mnt virtualbox-guest-utils-arch &>> feliz.log
     echo blacklist i2c_piix4 > /mnt/etc/modprobe.d/modprobe.conf 2>> feliz.log  # To overcome piix4 Virtualbox error
     cp virtualbox.conf /mnt/etc/modules-load.d/ 2>> feliz.log
   fi

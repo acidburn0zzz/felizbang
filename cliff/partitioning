@@ -201,7 +201,7 @@ done
 
 select_filesystem() { # $1 = list passed as string by caller
   local Counter=0
-  PrintOne "Please now select the file system for ${Partition}"
+  PrintOne "Please select the file system for ${Partition}"
   PrintOne "It is not recommended to mix the btrfs file-system with others."
   echo
   listgen1 "${TypeList}" "Filesystems"
@@ -248,7 +248,7 @@ AllocateRoot() {
   local Counter=0
   Partition=""
   PartitionType=""
-  PrintOne "Please now select a partition to use for root"
+  PrintOne "Please select a partition to use for root"
   echo
   listgen2 "$PartitionList" "Partitions" "" "PartitionArray"
   Reply=$Response

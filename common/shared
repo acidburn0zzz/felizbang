@@ -64,12 +64,17 @@ Result=""
 # --------------------------
 # Functions             Line
 # --------------------------
-# ReflectorMirrorList     73
-# LocalMirrorList         83
-# Partitioning     from   98
-# Review Stage     from  327
-# Install Stage    from  371
+# arch_chroot             75
+# ReflectorMirrorList     79
+# LocalMirrorList         89
+# Partitioning     from  104
+# Review Stage     from  333
+# Install Stage    from  377
 # --------------------------
+
+arch_chroot() {  # From Lution AIS
+  arch-chroot /mnt /bin/bash -c "${1}" 2>> feliz.log
+}
 
 ReflectorMirrorList() { # Use reflector (added to archiso) to generate fast mirror list
   TPecho "Generating mirrorlist"
@@ -375,7 +380,7 @@ AddExtras() {
 InstallLuxuries() { # Install Openbox and extras
   # Test for existing display manager and disable if necessary
   arch-chroot /mnt touch etc/output.log      # Create empty file
-  arch-chroot /mnt systemctl list-unit-files | grep 'lightdm.service' > mnt/etc/output.log
+  arch-chroot /mnt systemctl list-unit-files | grep 'lightdm.service' > /mnt/etc/output.log
   DMLine=`cat /mnt/etc/output.log`
   local Counter=1
   case ${DMLine} in
@@ -401,9 +406,9 @@ InstallLuxuries() { # Install Openbox and extras
   esac
   # Then install LightDM
   TPecho "Installing LightDM" ""
-  pacstrap /mnt lightdm lightdm-deepin-greeter &>> feliz.log
+  pacstrap /mnt lightdm lightdm-gtk-greeter &>> feliz.log
   arch_chroot "systemctl -f enable lightdm.service" >/dev/null
-  DisplayProgress "Installing 'Openbox' window manager" 20
+  DisplayProgress "Installing 'Openbox' window manager and components" 20
   pacstrap /mnt openbox obmenu obconf compton tint2 &>> feliz.log
 
   # add list of applications here .................................................................
