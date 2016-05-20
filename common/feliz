@@ -53,6 +53,7 @@ getkeymap
 SetTimeZone
 setlocale
 SetHostname
+SetUserName
 
 # Use dmidecode to check for Virtualbox installation
 IsInVbox=`dmidecode --type 1 | grep 'Product Name' | cut -c 16-`
@@ -128,6 +129,10 @@ InstallLuxuries # common/shared Install Openbox, applications and lightdm
 UserAdd # common/shared
 
 # ... copy over Openbox .conf and .xml files here .......................................................
+mkdir /mnt/home/$UserName/.config/openbox/ # Is this needed?
+cp rc.xml menu.xml /mnt/home/$UserName/.config/openbox/
+cp conkyrc /mnt/home/$UserName/.conkyrc
+cp bl-exit /mnt/usr/bin/
 
 EndTime=$(date +%s)
 Difference=$(( $EndTime-$StartTime ))

@@ -14,7 +14,7 @@
 # ----------------     -----------------------
 # Function    Line     Function           Line
 # ----------------     -----------------------
-# getkeymap     24     FinalCheck           93 
+# getkeymap     24     FinalCheck           93
 # setlocale     36     ManualSettings      183
 # settimezone   51     ChangeRootPartition 356
 # UserName      70     ChangeSwapPartition 364
@@ -67,7 +67,7 @@ SetTimeZone() {
   SUBZONE=$(cat output.file)
 }
 
-UserName() {
+SetUserName() {
   dialog --backtitle "$Backtitle" --title " - User Name - " --no-shadow --nocancel --inputbox "Enter a name for the primary user of the new system.\nIf you don't create a username here, a default user called 'archie' will be set up\n" 12 50 2> output.file
   Response=$(cat output.file)
   Entered=${Response,,}

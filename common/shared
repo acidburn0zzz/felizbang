@@ -404,10 +404,12 @@ InstallLuxuries() { # Install Openbox and extras
   pacstrap /mnt lightdm lightdm-greeter &>> feliz.log
   arch_chroot "systemctl -f enable lightdm.service" >/dev/null
   DisplayProgress "Installing 'Openbox' window manager" 20
-  pacstrap /mnt openbox obmenu &>> feliz.log
+  pacstrap /mnt openbox obmenu obconf compton tint2 &>> feliz.log
 
   # add list of applications here .................................................................
-  
+  pacstrap /mnt abiword epiphany galculator gnome-mahjongg gnumeric leafpad lxterminal &>> feliz.log
+  pacstrap /mnt nitrogen pavucontrol pcmanfm scrot sol xfce4-screenshooter &>> feliz.log
+
   TPecho "Modifying pacman.conf and installing Yaourt"
   cp pacman.conf /mnt/etc 2>> feliz.log # For installed system
   cp pacman.conf /etc 2>> feliz.log # For installer

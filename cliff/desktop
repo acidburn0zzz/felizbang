@@ -11,14 +11,14 @@
 
 # Please read the introduction in the README file
 
-# ------------------     # ------------------
-# Function      Line     # Function      Line
-# ------------------     # ------------------
-# getkeymap       26     # Username       191
-# setocale        64     # Hostname       207
-# SetTimeZone    120     # FinalCheck     224
-# SetSubZone     151     # ManualSettings 313
-# ------------------     # ------------------
+# ------------------     --------------------
+# Function      Line     Function        Line
+# ------------------     --------------------
+# getkeymap       26     SetUserName      191
+# setocale        64     SetHostname      207
+# SetTimeZone    120     FinalCheck       224
+# SetSubZone     151     ManualSettings   313
+# ------------------     --------------------
 
 getkeymap() {
   print_heading
@@ -185,7 +185,7 @@ do
 done
 }
 
-UserName() {
+SetUserName() {
   print_heading
   PrintOne "Enter a name for the primary user of the new system."
   PrintOne "If you don't create a username here, a default user"

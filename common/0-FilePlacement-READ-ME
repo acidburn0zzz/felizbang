@@ -8,10 +8,11 @@ For reference only:
   keymaps.list
   listgen.manual
 
-Copy to folder:
+Copy in /common/shared/ to folder:
   rc.xml            ~/.config/openbox/
   menu.xml          ~/.config/openbox/
   conkyrc           ~/
 
+Copied by /common/shared/InstallLuxuries
   pacman.conf
   virtualbox.conf
