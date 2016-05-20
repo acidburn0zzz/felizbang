@@ -19,7 +19,7 @@ source partitioning
 source desktop
 source listgen
 
-Backtitle="The Feliz-pop install scripts for Openbox Arch Linux"
+Backtitle="The FelizBang install scripts for Openbox Arch Linux"
 
 StartTime=$(date +%s)
 echo "${StartTime}" >> feliz.log
@@ -129,7 +129,8 @@ InstallLuxuries # common/shared Install Openbox, applications and lightdm
 UserAdd # common/shared
 
 # ... copy over Openbox .conf and .xml files here .......................................................
-mkdir /mnt/home/$UserName/.config/openbox/ # Is this needed?
+mkdir /mnt/home/$UserName/.config/
+mkdir /mnt/home/$UserName/.config/openbox/
 cp rc.xml menu.xml /mnt/home/$UserName/.config/openbox/
 cp conkyrc /mnt/home/$UserName/.conkyrc
 cp bl-exit /mnt/usr/bin/
