@@ -73,7 +73,7 @@ Result=""
 # --------------------------
 
 arch_chroot() {  # From Lution AIS
-  arch-chroot /mnt /bin/bash -c "${1}" 2>> feliz.log
+  arch-chroot /mnt /bin/bash -c "${1}" &>> feliz.log
 }
 
 ReflectorMirrorList() { # Use reflector (added to archiso) to generate fast mirror list
@@ -378,39 +378,11 @@ AddExtras() {
 #
 
 InstallLuxuries() { # Install Openbox and extras
-  # Test for existing display manager and disable if necessary
-  arch-chroot /mnt touch etc/output.log      # Create empty file
-  arch-chroot /mnt systemctl list-unit-files | grep 'lightdm.service' > /mnt/etc/output.log
-  DMLine=`cat /mnt/etc/output.log`
-  local Counter=1
-  case ${DMLine} in
-    "") echo "No previous DM discovered" >> feliz.log
-    ;;
-    *) local Continue="Y"
-      while [ ${Continue} = "Y" ]
-      do
-        ExDM=`echo $DMLine  | cut -f ${Counter} -d ' '` # First of pair is DM
-        if [ -z ${ExDM} ]; then
-          Continue="N" # Quit if no further entries
-          break
-        fi
-        Counter=$((Counter+1))
-        ExDMStatus=`echo $DMLine  | cut -f ${Counter} -d ' '` # Second is status
-        case ${ExDMStatus} in
-          "enabled") arch_chroot "systemctl disable ${ExDM}" >/dev/null
-          ;;
-          *) echo "${ExDM} already disabled" >> feliz.log
-        esac
-        Counter=$((Counter+1))
-      done
-  esac
-  # Then install LightDM
   TPecho "Installing LightDM and greeter" ""
   pacstrap /mnt lightdm lightdm-gtk-greeter &>> feliz.log
-  # Enable it
   arch_chroot "systemctl -f enable lightdm.service" >/dev/null
   # Set greeter
-  sed -i '/greeter-session=/ c\greeter-session=lightdm-gtk-greeter' /etc/lightdm/lightdm.conf
+  sed -i '/greeter-session=/ c greeter-session=lightdm-gtk-greeter' /etc/lightdm/lightdm.conf
   # Openbox
   DisplayProgress "Installing 'Openbox' window manager and components" 20
   pacstrap /mnt openbox obmenu obconf compton tint2 &>> feliz.log

@@ -99,11 +99,9 @@ export "LANG=${CountryLocale}" &>> feliz.log                      # eg: LANG=en_
 arch_chroot "ln -sf /usr/share/zoneinfo/${ZONE}/${SUBZONE} /etc/localtime"
 arch_chroot "hwclock --systohc --utc"
 # Networking
-if [ $Scope != "Basic" ]; then
-  arch_chroot "systemctl enable dhcpcd.service"
-  pacstrap /mnt networkmanager network-manager-applet rp-pppoe &>> feliz.log
-  arch_chroot "systemctl enable NetworkManager.service && systemctl enable NetworkManager-dispatcher.service"
-fi
+arch_chroot "systemctl enable dhcpcd.service"
+pacstrap /mnt networkmanager network-manager-applet rp-pppoe &>> feliz.log
+arch_chroot "systemctl enable NetworkManager.service && systemctl enable NetworkManager-dispatcher.service"
 
 if [ ${GrubDevice} ]; then
   TPecho "Installing Grub2 to $GrubDevice" ""
@@ -144,9 +142,7 @@ DIFFMIN=$(( $Difference / 60 ))
 DIFFSEC=$(( $Difference % 60 ))
 
 SetRootPassword
-if [ $Scope != "Basic" ]; then
-  SetUserPassword
-fi
+SetUserPassword
 
 cp feliz.log /mnt/etc # Copy installation log for reference
 

@@ -197,12 +197,13 @@ InstallKernel() { # Kernel and some other core systems
   case $Kernel in
   1) DisplayProgress "Installing LTS kernel" 50
     pacstrap /mnt linux-lts &>> feliz.log
-  ;;
+    ;;
   *) DisplayProgress "Installing Latest kernel" 50
     pacstrap /mnt linux &>> feliz.log
   esac
-  if [ -n ${IsInVbox} ] && [ $Scope != "Basic" ]; then # Installing in Virtualbox
-    pacstrap /mnt virtualbox-guest-utils-arch &>> feliz.log
+  if [ -n ${IsInVbox} ]; then # Installing in Virtualbox
+    pacstrap /mnt virtualbox-guest-utils &>> feliz.log
+    pacstrap /mnt virtualbox-guest-modules-arch &>> feliz.log
     echo blacklist i2c_piix4 > /mnt/etc/modprobe.d/modprobe.conf 2>> feliz.log  # To overcome piix4 Virtualbox error
     cp virtualbox.conf /mnt/etc/modules-load.d/ 2>> feliz.log
   fi
@@ -213,7 +214,7 @@ InstallKernel() { # Kernel and some other core systems
 AddCodecs() {
   PassArray=() # Ensure the array is empty
   PassArray=( a52dec autofs faac faad2 flac lame libdca libdv libmad libmpeg2 libtheora libvorbis libxv wavpack x264 gstreamer0.10-plugins pulseaudio pulseaudio-alsa libdvdcss libdvdread libdvdnav dvd+rw-tools dvdauthor dvgrab flashplugin b43-fwcutter ipw2100-fw ipw2200-fw zd1211-firmware iw wireless_tools wpa_actiond dialog xorg-server-utils xorg-xinit xorg-twm xf86-input-synaptics gvfs gamin )
-  ProgressArray "Adding Codecs, etc" # Display gauge while installing with pacstrap
+  ProgressArray "Adding Codecs, X, etc" # Display gauge while installing with pacstrap
 }
 
 McInitCPIO() { # Squiff version must be &>>
