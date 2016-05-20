@@ -401,7 +401,7 @@ InstallLuxuries() { # Install Openbox and extras
   esac
   # Then install LightDM
   TPecho "Installing LightDM" ""
-  pacstrap /mnt lightdm lightdm-greeter &>> feliz.log
+  pacstrap /mnt lightdm lightdm-deepin-greeter &>> feliz.log
   arch_chroot "systemctl -f enable lightdm.service" >/dev/null
   DisplayProgress "Installing 'Openbox' window manager" 20
   pacstrap /mnt openbox obmenu obconf compton tint2 &>> feliz.log
