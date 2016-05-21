@@ -237,23 +237,23 @@ InstallLuxuries() { # Install Yaourt, Openbox, LightDM and apps
   pacman -Sy &>> feliz.log              # Update
   pacstrap /mnt yaourt &>> feliz.log
 
- # TPecho "Installing LightDM and greeter" ""
- # pacstrap /mnt lightdm lightdm-gtk-greeter &>> feliz.log
- # arch_chroot "systemctl -f enable lightdm.service"
+  TPecho "Installing LightDM and greeter" ""
+  pacstrap /mnt lightdm lightdm-gtk-greeter &>> feliz.log
+  arch_chroot "systemctl -f enable lightdm.service"
   # Set greeter
- # sed -i '/greeter-session=/ c greeter-session=lightdm-gtk-greeter' /etc/lightdm/lightdm.conf
+  sed -i '/greeter-session=/ c greeter-session=lightdm-gtk-greeter' /etc/lightdm/lightdm.conf
   # Openbox
- # DisplayProgress "Installing 'Openbox' window manager and components" 20
- # pacstrap /mnt openbox obmenu obconf compton tint2 &>> feliz.log
+  DisplayProgress "Installing 'Openbox' window manager and components" 20
+  pacstrap /mnt openbox obmenu obconf compton tint2 &>> feliz.log
   # Applications ...
- # pacstrap /mnt abiword epiphany galculator gnome-mahjongg gnumeric leafpad lxterminal &>> feliz.log
- # pacstrap /mnt nitrogen pavucontrol pcmanfm scrot sol xfce4-screenshooter &>> feliz.log
+  pacstrap /mnt abiword epiphany galculator gnome-mahjongg gnumeric leafpad lxterminal &>> feliz.log
+  pacstrap /mnt nitrogen pavucontrol pcmanfm scrot sol xfce4-screenshooter &>> feliz.log
 
 # Experiment
-DisplayProgress "Installing 'LXDE' desktop Environment" 10
-pacstrap /mnt lxde &>> feliz.log
-arch_chroot "systemctl -f enable lxdm.service"
-echo "session=/usr/bin/startlxde" >> /mnt/etc/lxdm/lxdm.conf 2>> feliz.log
+# DisplayProgress "Installing 'LXDE' desktop Environment" 10
+# pacstrap /mnt lxde &>> feliz.log
+# arch_chroot "systemctl -f enable lxdm.service"
+# echo "session=/usr/bin/startlxde" >> /mnt/etc/lxdm/lxdm.conf 2>> feliz.log
 
   TPecho "Installing Conky"
   pacstrap /mnt conky &>> feliz.log
