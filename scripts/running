@@ -18,8 +18,8 @@
 # ProgressArray         56       McInitCPIO           221
 # Bugger                81       InstallLuxuries      231
 # SetKernel             85       UserAdd              254
-# ConfirmVbox           97       Passwords            233
-# ConfirmReview        108       Finish               261
+# ConfirmVbox           97       Passwords            277
+# ConfirmReview        108       Finish               332
 
 PrintOne() {  # Arguments: "Component" "Patient"
   dialog --backtitle "$Backtitle" --title " - Information - " --no-shadow --infobox "\n$1\n$2" 6 50 ; sleep 1 &
@@ -30,7 +30,7 @@ TPecho() { # For compatibility with Cliff
 }
 
 arch_chroot() {  # From Lution AIS
-  arch-chroot /mnt /bin/bash -c "${1}" &>> feliz.log
+  arch-chroot /mnt /bin/bash -c "${1}" # &>> feliz.log
 }
 
 DisplayProgress() {  # Displays timed progress bar for longer processes
@@ -216,7 +216,7 @@ InstallKernel() { # Kernel and some other core systems
 AddCodecs() {
   PassArray=() # Ensure the array is empty
   PassArray=( a52dec autofs faac faad2 flac lame libdca libdv libmad libmpeg2 libtheora libvorbis libxv wavpack x264 gstreamer0.10-plugins pulseaudio pulseaudio-alsa libdvdcss libdvdread libdvdnav dvd+rw-tools dvdauthor dvgrab flashplugin b43-fwcutter ipw2100-fw ipw2200-fw zd1211-firmware iw wireless_tools wpa_actiond dialog xorg-server-utils xorg-xinit xorg-twm xf86-input-synaptics gvfs gamin )
-  ProgressArray "Adding Codecs, etc" # Display gauge while installing with pacstrap
+  ProgressArray "Adding Codecs, graphics, etc" # Display gauge while installing with pacstrap
 }
 
 McInitCPIO() { # Appropriate mkinitcpio for kernel
