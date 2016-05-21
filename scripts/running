@@ -3,25 +3,23 @@
 # The Feliz installation scripts for Arch Linux
 # 21 April 2016
 
-# Semi-graphical interface
-# /squiff/various
-# Various functions for input/output, processing and installing
+# running - Various functions called during installation
 
 # Developed by Elizabeth Mills, incorporating some code adapted from
 # the Evo/Lution script by Carl Duff and AUI scripts by HelmuthDU.
 
-# Please read the introduction in the README file
-
 # -------------------------      -------------------------
 # Functions           Line       Functions           Line
 # -------------------------      -------------------------
-# PrintOne              31       ConfirmReview        112
-# TPecho                35       SetGrubDevice        120
-# DisplayProgress       39       MountPartitions      134
-# ProgressArray         58       InstallKernel        192
-# Bugger                83       AddCodecs            218
-# SetKernel             87       Passwords            233
-# ConfirmVbox           99       Finish               261
+# PrintOne              25       SetGrubDevice        116
+# TPecho                29       MountPartitions      130
+# arch_chroot           33       InstallKernel        188
+# DisplayProgress       37       AddCodecs            218
+# ProgressArray         56       McInitCPIO           221
+# Bugger                81       InstallLuxuries      231
+# SetKernel             85       UserAdd              254
+# ConfirmVbox           97       Passwords            233
+# ConfirmReview        108       Finish               261
 
 PrintOne() {  # Arguments: "Component" "Patient"
   dialog --backtitle "$Backtitle" --title " - Information - " --no-shadow --infobox "\n$1\n$2" 6 50 ; sleep 1 &
@@ -31,41 +29,8 @@ TPecho() { # For compatibility with Cliff
     PrintOne "$1" "$2"
 }
 
-# Both functions prepare the array Options[@] for display in a Dialog menu
-declare -a Options  # For caller
-
-listgen1() {
-  Counter=0
-  Options=() # Empty the array
-  # Prepare $1 for dialog menu
-  for item in $1 # Prepare string array of list items passed as $1
-  do
-    Counter=$((Counter+1))
-    Options[${Counter}]="$item"
-    Counter=$((Counter+1))
-    Options[${Counter}]="-"
-  done
-}
-
-listgen2() {
-  Options=() # Empty the array
-  Counter=0
-  for item in $1; do
-    Items[${Counter}]=$item
-    Counter=$((Counter+1))
-  done
-  Counter=0
-  local ItemCounter=0
-  # Import the complex array
-  name=$2[@]
-  LongName=("${!name}")
-  # Combine for dialog menu
-  for item in "${LongName[@]}"; do
-    Options[$((Counter))]="${Items[${ItemCounter}]}"
-    Options[$((Counter+1))]="$item"
-    Counter=$((Counter+2))
-    ItemCounter=$((ItemCounter+1))
-  done
+arch_chroot() {  # From Lution AIS
+  arch-chroot /mnt /bin/bash -c "${1}" &>> feliz.log
 }
 
 DisplayProgress() {  # Displays timed progress bar for longer processes
@@ -254,12 +219,50 @@ AddCodecs() {
   ProgressArray "Adding Codecs, X, etc" # Display gauge while installing with pacstrap
 }
 
-McInitCPIO() { # Squiff version must be &>>
+McInitCPIO() { # Appropriate mkinitcpio for kernel
   DisplayProgress "Running mkinitcpio" 10
   if [ $Kernel = "1" ]; then
     arch_chroot "mkinitcpio -p linux-lts"
   else
     arch_chroot "mkinitcpio -p linux"
+  fi
+}
+
+InstallLuxuries() { # Install Openbox and extras
+  TPecho "Installing LightDM and greeter" ""
+  pacstrap /mnt lightdm lightdm-gtk-greeter &>> feliz.log
+  arch_chroot "systemctl -f enable lightdm.service" >/dev/null
+  # Set greeter
+  sed -i '/greeter-session=/ c greeter-session=lightdm-gtk-greeter' /etc/lightdm/lightdm.conf
+  # Openbox
+  DisplayProgress "Installing 'Openbox' window manager and components" 20
+  pacstrap /mnt openbox obmenu obconf compton tint2 &>> feliz.log
+  # Applications ...
+  pacstrap /mnt abiword epiphany galculator gnome-mahjongg gnumeric leafpad lxterminal &>> feliz.log
+  pacstrap /mnt nitrogen pavucontrol pcmanfm scrot sol xfce4-screenshooter &>> feliz.log
+  TPecho "Modifying pacman.conf and installing Yaourt"
+  cp pacman.conf /mnt/etc 2>> feliz.log # For installed system
+  cp pacman.conf /etc 2>> feliz.log     # For installer
+  pacman-key --init &>> feliz.log
+  pacman-key --populate archlinux &>> feliz.log
+  pacman -Sy &>> feliz.log              # Update
+  pacstrap /mnt yaourt &>> feliz.log
+  TPecho "Installing Conky"
+  pacstrap /mnt conky &>> feliz.log
+}
+
+UserAdd() {
+  CheckUsers=`cat /mnt/etc/passwd | grep ${UserName}`
+  # If not already exist, create user
+  if [ -z ${CheckUsers} ]; then
+    TPecho "Adding user '${UserName}' and setting up groups"
+    arch_chroot "useradd ${UserName} -m -g users -G wheel,storage,power,network,video,audio,lp -s /bin/bash"
+    # Set up basic configuration files and permissions for user
+    arch_chroot "cp /etc/skel/.bashrc /home/${UserName}"
+    arch_chroot "chown -R ${UserName}:users /home/${UserName}"
+    sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /mnt/etc/sudoers 2>> feliz.log
+  else
+    TPecho "User already exists"
   fi
 }
 
@@ -319,5 +322,5 @@ SetUserPassword() {
 }
 
 DisplayFinished() {
-  dialog --backtitle "$Backtitle" --no-shadow --msgbox "\nCongratulations, installation is complete, and it is time to restart the computer into your new system.\nHave fun with Arch Linux." 10 40
+  dialog --backtitle "$Backtitle" --no-shadow --msgbox "\nCongratulations, installation is complete.\n The FelizBang installer will now shut down.\nRemove the FelizBang disk before restarting.\nHave fun." 10 40
 }

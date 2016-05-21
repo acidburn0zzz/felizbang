@@ -3,17 +3,60 @@
 # The FelizBang installation scripts for Openbox Arch Linux
 # May 2016
 
-# /common/feliz - Main module
+# feliz - Main module
 
-# Developed by Elizabeth Mills, incorporating some code adapted from
-# the Evo/Lution script by Carl Duff and AUI scripts by HelmuthDU.
+# Developed by Elizabeth Mills, incorporating some code adapted with thanks
+# from the Evo/Lution script by Carl Duff and AUI scripts by HelmuthDU.
 
-# Please read the introduction in the README file
+# Declare variables
+#
+# 1) Partitioning variables and arrays
+declare -a AddPartList    # Array of additional partitions eg: /dev/sda5
+declare -a AddPartMount   # Array of mountpoints for the same partitions eg: /home
+declare -a AddPartType    # Array of format type for the same partitions eg: ext4
+declare -a PartitionArray # Array of long identifiers
+declare -a NewArray       # For copying any array
+declare -A LabellingArray # Associative array of user labels for partitions
+declare -A Labelled       # Associative array of labelled partitions
+declare -A FileSystem     # Associative array of filesystem types (ext* swap)
+SwapPartition=""  # eg: /dev/sda3
+FormatSwap="N"    # User selects whether to reuse swap
+MakeSwap="Y"
+SwapFile=""       # eg: 2G
+IsSwap=""         # Result of lsblk test
+RootPartition=""  # eg: /dev/sda2
+RootType=""       # eg: ext4
+Partition=""      # eg: sda1
+AutoPart=0        # Flag - changes to 1 if auto-partition is chosen
+UseDisk="sda"     # Used if more than one disk
+DiskDetails=0     # Size of selected disk
+#
+# 2) Grub, kernel & EFI variables
+GrubDevice=""     # eg: /dev/sda
+Kernel="1"        # Default 1 = LTS
+IsInVbox=""       # Result of test to see if installation is in Virtualbox
+DualBoot="N"      # Ready for dual-booting option
+EFIPartition=""   # Will hold EFI partition mountpoint in format "/dev/sda1"
+OSprober="Y"
+#
+# 3) Location variables
+CountryCode=""    # eg: GB ... for mirrorlist
+CountryLocale=""  # eg: en_GB.UTF-8
+Countrykbd=""     # eg: uk
+ZONE=""           # eg: Europe For time
+SUBZONE=""        # eg: London
+#
+# 4) Root and user variables
+HostName=""  # eg: arch-linux
+UserName=""  # eg: archie
+Scope="Full" # Installation scope ... hangover from Feliz
+#
+# 5) Global user input variables
+Response=""
+Result=""
 
 #
 # Include source files
-#
-source shared
 source setup
 source running
 
@@ -79,6 +122,8 @@ arch_chroot "PATH=/usr/lib/systemd/system:/etc/systemd/system:/usr/local/sbin:/u
 
 # Generate fstab
 genfstab -U -p /mnt > /mnt/etc/fstab 2>> feliz.log
+
+# Swap
 if [ ${SwapFile} ]; then
   fallocate -l ${SwapFile} /mnt/swapfile >/dev/null 2>> feliz.log
   chmod 600 /mnt/swapfile >/dev/null &>> feliz.log
@@ -86,6 +131,8 @@ if [ ${SwapFile} ]; then
   swapon /mnt/swapfile >/dev/null &>> feliz.log
   echo "/swapfile none  swap  defaults  0 0" >> /mnt/etc/fstab 2>> feliz.log
 fi
+
+# Hostname, locale, etc
 echo ${HostName} > /mnt/etc/hostname 2>> feliz.log
 sed -i "/127.0.0.1/s/$/ ${HostName}/" /mnt/etc/hosts &>> feliz.log
 sed -i "/::1/s/$/ ${HostName}/" /mnt/etc/hosts &>> feliz.log
@@ -96,11 +143,13 @@ echo "LANG=${CountryLocale}" > /mnt/etc/locale.conf 2>> feliz.log # eg: LANG=en_
 export "LANG=${CountryLocale}" &>> feliz.log                      # eg: LANG=en_US.UTF-8
 arch_chroot "ln -sf /usr/share/zoneinfo/${ZONE}/${SUBZONE} /etc/localtime"
 arch_chroot "hwclock --systohc --utc"
+
 # Networking
 arch_chroot "systemctl enable dhcpcd.service"
 pacstrap /mnt networkmanager network-manager-applet rp-pppoe &>> feliz.log
 arch_chroot "systemctl enable NetworkManager.service && systemctl enable NetworkManager-dispatcher.service"
 
+# Grub
 if [ ${GrubDevice} ]; then
   TPecho "Installing Grub2 to $GrubDevice" ""
   pacstrap /mnt grub &>> feliz.log
@@ -113,16 +162,16 @@ else
   echo "Not installing Grub" >> feliz.log
 fi
 
-McInitCPIO
+McInitCPIO # Function to run mkinitcpio
 
 # Set keyboard to selected language at next startup
 echo KEYMAP=${Countrykbd} > /mnt/etc/vconsole.conf 2>> feliz.log
 
 AddCodecs # Various bits
 
-InstallLuxuries # common/shared Install Openbox, applications and lightdm
+InstallLuxuries # Install Openbox, applications and lightdm
 
-UserAdd # common/shared
+UserAdd
 
 # Openbox .conf and .xml files ...
 arch_chroot "mkdir /home/$UserName/.config/"
