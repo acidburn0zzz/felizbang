@@ -30,7 +30,7 @@ TPecho() { # For compatibility with Cliff
 }
 
 arch_chroot() {  # From Lution AIS
-  arch-chroot /mnt /bin/bash -c "${1}" # &>> feliz.log
+  arch-chroot /mnt /bin/bash -c "${1}" &>> feliz.log
 }
 
 DisplayProgress() {  # Displays timed progress bar for longer processes
@@ -75,57 +75,6 @@ ProgressArray() { # For installing multiple programs with pacstrap and displayin
     pacstrap /mnt $f &>> feliz.log
   done
   )
-}
-
-Bugger() {
-  dialog --backtitle "This shouldn't be happening" --title " - Information - " --no-shadow --infobox "\n      This is a bug\n\n           =Ộ= \n\n  It is probably harmless" 9 30
-}
-
-SetKernel() { # Note: Kernel commands linux & linux-lts include base/commonutils
-  listgen1 "LTS Latest"
-  dialog --backtitle "$Backtitle" --title " - Choose your kernel - " --no-shadow --ok-button "Select" --nocancel --menu "The Long-Term-Support kernel (LTS) offers stabilty, while the Latest kernel has all the new features. If in doubt, choose LTS.\n" 12 60 6 "${Options[@]}" 2> output.file
-  case $(cat output.file) in
-   "LTS") Kernel=1 # Set the Kernel variable (1 = LTS; 2 = Latest)
-   ;;
-   "Latest") Kernel=2 # Set the Kernel variable (1 = LTS; 2 = Latest)
-   ;;
-   *) echo "${Debug}" >> feliz.log
-  esac
-}
-
-ConfirmVbox() {
-  local Message="It appears that feliz is running in Virtualbox. If you wish, feliz can install Virtualbox guest utilities and make appropriate settings for you.\n\nInstall Virtualbox guest utilities?"
-    dialog --backtitle "$Backtitle" --title " - Virtualbox guest modules - " --no-shadow --yesno "$Message\n" 10 50
-    RetVal=$?
-    case $RetVal in
-      0) IsInVbox="VirtualBox"
-        Retry="N"
-      ;;
-      *) IsInVbox=""
-        Retry="N"
-    esac
-}
-
-ConfirmReview() {
-  dialog --backtitle "$Backtitle" --title " - Review - " --no-shadow --yesno "You have chosen to edit your choices for\n  $Response\n\nAre you sure?\n" 8 50
-    RetVal=$?
-    if [ $RetVal -ne 0 ]; then
-      FinalCheck
-    fi
-}
-
-SetGrubDevice() {
-  DEVICE=""
-  DevicesList="$(lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd\|vd')";
-  GrubDevice=""
-  listgen1 "${DevicesList}"
-  dialog --backtitle "$Backtitle" --title " - Devices - " --no-shadow --ok-button "Select" --menu "Select the device where Grub is to be installed.\nNote that if you do not select a device, Grub will not be installed, and you will have to make alternative arrangements for booting your new system.\n" 14 60 6 "${Options[@]}" 2> output.file
-  RetVal=$?
-  if [ $RetVal -gt 0 ]; then # <Cancel> selected
-   GrubDevice=""
-  else
-   GrubDevice=$(cat output.file)
-  fi
 }
 
 MountPartitions() {
@@ -191,8 +140,12 @@ InstallKernel() { # Kernel and some other core systems
   pacstrap /mnt base-devel bash &>> feliz.log
   # Create array of all the programs to pass to installing function
   PassArray=() # Ensure array is empty
-  PassArray=( btrfs-progs cryptsetup dhcpcd gksu inetutils iproute2 iputils jfsutils licenses logrotate lvm2 man-db man-pages mdadm netctl ntp pciutils pcmciautils procps-ng psmisc s-nail systemd-sysvcompat usbutils wget xfsprogs zip nano openssh reiserfsprogs screenfetch unrar unzip vi vim xarchiver xorg-xedit xterm )
+  PassArray=( btrfs-progs cryptsetup dhcpcd gksu inetutils iproute2 iputils jfsutils licenses logrotate lvm2 mdadm netctl ntp pciutils pcmciautils procps-ng psmisc s-nail systemd-sysvcompat usbutils wget xfsprogs zip nano openssh reiserfsprogs screenfetch unrar unzip vi vim xarchiver xorg-xedit xterm )
   ProgressArray " Installing cli tools " # Install each one using pacstrap
+
+  DisplayProgress "Installing man pages" 20
+  pacstrap /mnt man-db man-pages &>> feliz.log
+
   # Enable sshd
   arch_chroot "systemctl enable sshd.service" >/dev/null
 
@@ -249,29 +202,17 @@ InstallLuxuries() { # Install Yaourt, Openbox, LightDM and apps
   pacstrap /mnt abiword epiphany galculator gnome-mahjongg gnumeric leafpad lxterminal &>> feliz.log
   pacstrap /mnt nitrogen pavucontrol pcmanfm scrot sol xfce4-screenshooter &>> feliz.log
 
-# Experiment
-# DisplayProgress "Installing 'LXDE' desktop Environment" 10
-# pacstrap /mnt lxde &>> feliz.log
-# arch_chroot "systemctl -f enable lxdm.service"
-# echo "session=/usr/bin/startlxde" >> /mnt/etc/lxdm/lxdm.conf 2>> feliz.log
-
   TPecho "Installing Conky"
   pacstrap /mnt conky &>> feliz.log
 }
 
 UserAdd() {
- # CheckUsers=`cat /mnt/etc/passwd | grep ${UserName}`
- # If not already exist, create user
- # if [ -z ${CheckUsers} ]; then
-    TPecho "Adding user '${UserName}' and setting up groups"
-    arch_chroot "useradd ${UserName} -m -g users -G wheel,storage,power,network,video,audio,lp -s /bin/bash"
-    # Set up basic configuration files and permissions for user
-    arch_chroot "cp /etc/skel/.bashrc /home/${UserName}"
-    arch_chroot "chown -R ${UserName}:users /home/${UserName}"
-    sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /mnt/etc/sudoers 2>> feliz.log
- # else
- #   TPecho "User already exists"
- # fi
+  TPecho "Adding user '${UserName}' and setting up groups"
+  arch_chroot "useradd ${UserName} -m -g users -G wheel,storage,power,network,video,audio,lp -s /bin/bash"
+  # Set up basic configuration files and permissions for user
+  arch_chroot "cp /etc/skel/.bashrc /home/${UserName}"
+  arch_chroot "chown -R ${UserName}:users /home/${UserName}"
+  sed -i '/%wheel ALL=(ALL) ALL/s/^#//' /mnt/etc/sudoers 2>> feliz.log
 }
 
 SetRootPassword() {
@@ -330,5 +271,5 @@ SetUserPassword() {
 }
 
 DisplayFinished() {
-  dialog --backtitle "$Backtitle" --no-shadow --msgbox "\nCongratulations, installation is complete.\n The FelizBang installer will now shut down.\nRemove the FelizBang disk before restarting.\nHave fun." 10 55
+  dialog --backtitle "$Backtitle" --no-shadow --msgbox "\nCongratulations, installation is complete, and the FelizBang installer will now shut down.\nRemember to remove the FelizBang disk before restarting.\nHave fun." 10 55
 }

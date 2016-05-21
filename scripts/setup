@@ -997,3 +997,54 @@ AddExtras() {
   done
   Ignores=${#Ignorelist[@]} # Save a count for later
 }
+
+Bugger() {
+  dialog --backtitle "This shouldn't be happening" --title " - Information - " --no-shadow --infobox "\n      This is a bug\n\n           =Ộ= \n\n  It is probably harmless" 9 30
+}
+
+SetKernel() { # Note: Kernel commands linux & linux-lts include base/commonutils
+  listgen1 "LTS Latest"
+  dialog --backtitle "$Backtitle" --title " - Choose your kernel - " --no-shadow --ok-button "Select" --nocancel --menu "The Long-Term-Support kernel (LTS) offers stabilty, while the Latest kernel has all the new features. If in doubt, choose LTS.\n" 12 60 6 "${Options[@]}" 2> output.file
+  case $(cat output.file) in
+   "LTS") Kernel=1 # Set the Kernel variable (1 = LTS; 2 = Latest)
+   ;;
+   "Latest") Kernel=2 # Set the Kernel variable (1 = LTS; 2 = Latest)
+   ;;
+   *) echo "${Debug}" >> feliz.log
+  esac
+}
+
+ConfirmVbox() {
+  local Message="It appears that feliz is running in Virtualbox. If you wish, feliz can install Virtualbox guest utilities and make appropriate settings for you.\n\nInstall Virtualbox guest utilities?"
+    dialog --backtitle "$Backtitle" --title " - Virtualbox guest modules - " --no-shadow --yesno "$Message\n" 10 50
+    RetVal=$?
+    case $RetVal in
+      0) IsInVbox="VirtualBox"
+        Retry="N"
+      ;;
+      *) IsInVbox=""
+        Retry="N"
+    esac
+}
+
+ConfirmReview() {
+  dialog --backtitle "$Backtitle" --title " - Review - " --no-shadow --yesno "You have chosen to edit your choices for\n  $Response\n\nAre you sure?\n" 8 50
+    RetVal=$?
+    if [ $RetVal -ne 0 ]; then
+      FinalCheck
+    fi
+}
+
+SetGrubDevice() {
+  DEVICE=""
+  DevicesList="$(lsblk -d | awk '{print "/dev/" $1}' | grep 'sd\|hd\|vd')";
+  GrubDevice=""
+  listgen1 "${DevicesList}"
+  dialog --backtitle "$Backtitle" --title " - Devices - " --no-shadow --ok-button "Select" --menu "Select the device where Grub is to be installed.\nNote that if you do not select a device, Grub will not be installed, and you will have to make alternative arrangements for booting your new system.\n" 14 60 6 "${Options[@]}" 2> output.file
+  RetVal=$?
+  if [ $RetVal -gt 0 ]; then # <Cancel> selected
+   GrubDevice=""
+  else
+   GrubDevice=$(cat output.file)
+  fi
+}

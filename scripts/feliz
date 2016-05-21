@@ -174,14 +174,13 @@ InstallLuxuries # Install Openbox, applications and lightdm
 UserAdd         # Add user and set up groups
 
 # Copy Openbox .conf and .xml files ...
-# arch_chroot "mkdir /home/$UserName/.config/"
-# arch_chroot "mkdir /home/$UserName/.config/openbox/"
-# cp rc.xml menu.xml /mnt/home/$UserName/.config/openbox/
-# cp conkyrc /mnt/home/$UserName/.conkyrc
-# cp bl-exit /mnt/usr/bin/
-# arch_chroot "mkdir /home/$UserName/Pictures/"
-# arch_chroot "mkdir /home/$UserName/Pictures/Wallpapers/"
-# cp wallpaper.jpg /mnt/home/$UserName/Pictures/Wallpapers/
+mkdir -p /mnt/home/$UserName/.config/openbox
+cp rc.xml menu.xml /mnt/home/$UserName/.config/openbox
+cp conkyrc /mnt/home/$UserName/.conkyrc
+cp bl-exit /mnt/usr/bin/
+mkdir -p /home/$UserName/Pictures/Wallpapers
+cp wallpaper.jpg /mnt/home/$UserName/Pictures/Wallpapers
+arch_chroot "chown -R ${UserName}:users /home/${UserName}" # I don't know what this does, but it is in lution.ais
 
 EndTime=$(date +%s)
 Difference=$(( $EndTime-$StartTime ))
