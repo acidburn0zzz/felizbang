@@ -58,28 +58,23 @@
       </item>
     </menu>
     <separator/>
-    <item label="LibreOffice Writer">
+    <item label="Abiword Word Processor">
       <action name="Execute">
-        <execute>libreoffice --writer</execute>
+        <execute>abiword</execute>
       </action>
     </item>
-    <item label="Yaourt">
+    <item label="Evince Document Reader">
       <action name="Execute">
-        <execute>yaourt</execute>
+        <execute>evince</execute>
       </action>
     </item>
     <separator/>
-    <item label="Solitaire">
+    <item label="Gnumeric Spreadsheet">
       <action name="Execute">
-        <execute>sol</execute>
+        <execute>gnumeric</execute>
       </action>
     </item>
-    <item label="Mahjongg">
-      <action name="Execute">
-        <execute>gnome-mahjongg</execute>
-      </action>
-    </item>
-    <item label="Volume">
+     <item label="Volume">
       <action name="Execute">
         <execute>pavucontrol</execute>
       </action>

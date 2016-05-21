@@ -175,12 +175,21 @@ UserAdd         # Add user and set up groups
 
 # Copy Openbox .conf and .xml files ...
 mkdir -p /mnt/home/$UserName/.config/openbox
+read -p "$LINENO"
 cp rc.xml menu.xml /mnt/home/$UserName/.config/openbox
+read -p "$LINENO"
 cp conkyrc /mnt/home/$UserName/.conkyrc
+read -p "$LINENO"
 cp bl-exit /mnt/usr/bin/
+read -p "$LINENO"
 mkdir -p /home/$UserName/Pictures/Wallpapers
+read -p "$LINENO"
 cp wallpaper.jpg /mnt/home/$UserName/Pictures/Wallpapers
-arch_chroot "chown -R ${UserName}:users /home/${UserName}" # I don't know what this does, but it is in lution.ais
+read -p "$LINENO"
+arch_chroot "chown -R ${UserName}:users /home/${UserName}" &>> feliz.log # I don't know what this does, but it is in lution.ais
+read -p "$LINENO"
+
+# Setup needed here for startup file (with wallpaper setting)
 
 EndTime=$(date +%s)
 Difference=$(( $EndTime-$StartTime ))

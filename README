@@ -1,3 +1,5 @@
+Warning: FelizBang is still in the early stages of development. It is unfinished and contains bugs. It is not ready for general use.
+
 The FelizBang script set offers a quick and easy way to install Arch Linux with a fully working Openbox desktop. It is shared in the spirit of the community, subject to the conditions set out in the GNU GENERAL LICENSE.
 
 FelizBang is always up-to-date - each time you run the FelizBang iso it downloads the latest version of the scripts from Github. It helps you to you to set up your partitioning and enter such essential data as your location, username, etc, then the script runs without further intervention to the end.
