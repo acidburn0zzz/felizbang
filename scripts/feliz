@@ -134,8 +134,8 @@ fi
 
 # Hostname, locale, etc
 echo ${HostName} > /mnt/etc/hostname 2>> feliz.log
-sed -i "/127.0.0.1/s/$/ ${HostName}/" /mnt/etc/hosts &>> feliz.log
-sed -i "/::1/s/$/ ${HostName}/" /mnt/etc/hosts &>> feliz.log
+sed -i "/127.0.0.1/s/$/ ${HostName}/" /mnt/etc/hosts 2>> feliz.log
+sed -i "/::1/s/$/ ${HostName}/" /mnt/etc/hosts 2>> feliz.log
 # Set up locale, etc
 echo "${CountryLocale} UTF-8" > /mnt/etc/locale.gen 2>> feliz.log # eg: en_US.UTF-8 UTF-8
 arch_chroot "locale-gen"
@@ -167,13 +167,13 @@ McInitCPIO # Function to run mkinitcpio
 # Set keyboard to selected language at next startup
 echo KEYMAP=${Countrykbd} > /mnt/etc/vconsole.conf 2>> feliz.log
 
-AddCodecs # Various bits
+AddCodecs       # Various bits
 
 InstallLuxuries # Install Openbox, applications and lightdm
 
-UserAdd
+UserAdd         # Add user and set up groups
 
-# Openbox .conf and .xml files ...
+# Copy Openbox .conf and .xml files ...
 arch_chroot "mkdir /home/$UserName/.config/"
 arch_chroot "mkdir /home/$UserName/.config/openbox/"
 cp rc.xml menu.xml /mnt/home/$UserName/.config/openbox/
