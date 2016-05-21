@@ -14,10 +14,8 @@
 # Include source files
 #
 source shared
-source various
-source partitioning
-source desktop
-source listgen
+source setup
+source running
 
 Backtitle="The FelizBang install scripts for Openbox Arch Linux"
 
