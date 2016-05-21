@@ -243,8 +243,10 @@ InstallLuxuries() { # Install Yaourt, Openbox, LightDM and apps
   # Set greeter
   sed -i '/greeter-session=/ c greeter-session=lightdm-gtk-greeter' /etc/lightdm/lightdm.conf
   # Openbox
-  DisplayProgress "Installing 'Openbox' window manager and components" 20
-  pacstrap /mnt openbox obmenu obconf compton tint2 &>> feliz.log
+ # DisplayProgress "Installing 'Openbox' window manager and components" 20
+ # pacstrap /mnt openbox obmenu obconf compton tint2 &>> feliz.log
+  DisplayProgress "Installing LXDE" 20
+  pacstrap /mnt lxde
   # Applications ...
   pacstrap /mnt abiword epiphany galculator gnome-mahjongg gnumeric leafpad lxterminal &>> feliz.log
   pacstrap /mnt nitrogen pavucontrol pcmanfm scrot sol xfce4-screenshooter &>> feliz.log
